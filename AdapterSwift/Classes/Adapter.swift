@@ -11,17 +11,30 @@ import Foundation
  * CGSize
  * CGRect
  * UIFont （保留字体的其他属性，只改变pointSize）
+ * CGPoint
  */
 
 
+import UIKit
+
 public struct Adapter {
     public static var share = Adapter()
-    
-    /// 参考标准（UI是以哪个屏幕设计UI的）
     public var base: Double = 375
+    public var mode: AdapterMode = .width
     
-    /// 记录适配比例
-    fileprivate var adapterScale: Double?
+    public enum AdapterMode {
+        case width, height
+    }
+    
+    fileprivate func currentScale() -> Double {
+        let screen = UIScreen.main.bounds.size
+        switch mode {
+        case .width:
+            return screen.width / base
+        case .height:
+            return screen.height / base
+        }
+    }
 }
 
 public protocol Adapterable {
@@ -31,100 +44,97 @@ public protocol Adapterable {
 
 extension Adapterable {
     func adapterScale() -> Double {
-        
-        if let scale = Adapter.share.adapterScale {
-            return scale
-        } else {
-            let width = UIScreen.main.bounds.size.width
-            /// 参考标准以 iPhone 6 的宽度为基准
-            let referenceWidth: Double = Adapter.share.base
-            let scale = width / referenceWidth
-            Adapter.share.adapterScale = scale
-            return scale
-        }
+        Adapter.share.currentScale()
     }
 }
 
-
-
+// MARK: - 数值类型
 extension Int: Adapterable {
-    public typealias AdapterType = Int
     public var adapter: Int {
-        let scale = adapterScale()
-        let value = Double(self) * scale
-        return Int(value)
+        Int((Double(self) * adapterScale()).rounded())
     }
 }
-
-
 extension CGFloat: Adapterable {
-    public typealias AdapterType = CGFloat
     public var adapter: CGFloat {
-        let scale = adapterScale()
-        let value = self * scale
-        return value
+        self * adapterScale()
     }
 }
-
 extension Double: Adapterable {
-    public typealias AdapterType = Double
     public var adapter: Double {
-        let scale = adapterScale()
-        let value = self * scale
-        return value
+        self * adapterScale()
     }
 }
-
-
 extension Float: Adapterable {
-    public typealias AdapterType = Float
     public var adapter: Float {
-        let scale = adapterScale()
-        let value = self * Float(scale)
-        return value
+        self * Float(adapterScale())
     }
 }
 
-
+// MARK: - 尺寸类型
 extension CGSize: Adapterable {
-    public typealias AdapterType = CGSize
     public var adapter: CGSize {
-        let scale = adapterScale()
-        
-        let width = self.width * scale
-        let height = self.height * scale
-        
-        return CGSize(width: width, height: height)
+        CGSize(width: width.adapter, height: height.adapter)
     }
 }
-
-
 extension CGRect: Adapterable {
-    public typealias AdapterType = CGRect
     public var adapter: CGRect {
-
-        /// 不参与屏幕rect
-        if self == UIScreen.main.bounds {
-            return self
-        }
-
-        let scale = adapterScale()
-        let x = origin.x * scale
-        let y = origin.y * scale
-        let width = size.width * scale
-        let height = size.height * scale
-        return CGRect(x: x, y: y, width: width, height: height)
+        self == UIScreen.main.bounds ? self :
+        CGRect(x: origin.x.adapter, y: origin.y.adapter,
+               width: size.width.adapter, height: size.height.adapter)
+    }
+}
+extension CGPoint: Adapterable {
+    public var adapter: CGPoint {
+        CGPoint(x: x.adapter, y: y.adapter)
     }
 }
 
-
+extension UIEdgeInsets: Adapterable {
+    public var adapter: UIEdgeInsets {
+        UIEdgeInsets(top: top.adapter, left: left.adapter,
+                     bottom: bottom.adapter, right: right.adapter)
+    }
+}
 extension UIFont: Adapterable {
-    public typealias AdapterType = UIFont
     public var adapter: UIFont {
-        let scale = adapterScale()
-        let pointSzie = self.pointSize * scale
-        let fontDescriptor = self.fontDescriptor
-        return UIFont(descriptor: fontDescriptor, size: pointSzie)
+        withSize(pointSize.adapter)
     }
 }
 
+
+import UIKit
+
+extension UIView {
+    /// 递归适配当前视图及其所有子视图
+    public func adapterAll() {
+        // 1. Frame 适配
+        self.frame = self.frame.adapter
+        
+        // 2. 字体适配（UILabel / UIButton / UITextField / UITextView）
+        if let label = self as? UILabel {
+            label.font = label.font.adapter
+        } else if let button = self as? UIButton {
+            if let font = button.titleLabel?.font {
+                button.titleLabel?.font = font.adapter
+            }
+        } else if let textField = self as? UITextField {
+            if let font = textField.font {
+                textField.font = font.adapter
+            }
+        } else if let textView = self as? UITextView {
+            textView.font = textView.font?.adapter
+        }
+        
+        // 3. EdgeInsets 适配（UIButton 的内容内边距、title 边距、image 边距）
+        if let button = self as? UIButton {
+            button.contentEdgeInsets = button.contentEdgeInsets.adapter
+            button.titleEdgeInsets = button.titleEdgeInsets.adapter
+            button.imageEdgeInsets = button.imageEdgeInsets.adapter
+        }
+        
+        // 4. 递归子视图
+        for subview in subviews {
+            subview.adapterAll()
+        }
+    }
+}

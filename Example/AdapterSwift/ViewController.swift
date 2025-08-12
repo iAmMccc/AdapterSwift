@@ -77,6 +77,8 @@ class ViewController: UIViewController {
             make.height.top.width.equalTo(aView)
             make.left.equalTo(bView.snp.right)
         }
+        
+        
     }
 
     
