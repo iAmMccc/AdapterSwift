@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'AdapterSwift'
-  s.version          = '1.0.0'
+  s.version          = '1.1.0'
   s.summary          = 'SwiftUI精细化方案'
   
   s.homepage         = 'https://github.com/intsig171'
