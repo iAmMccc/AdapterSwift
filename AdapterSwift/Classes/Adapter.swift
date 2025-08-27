@@ -51,7 +51,7 @@ extension Adapterable {
 // MARK: - 数值类型
 extension Int: Adapterable {
     public var adapter: Int {
-        Int((Double(self) * adapterScale()).rounded())
+        Int((Double(self) * adapterScale()))
     }
 }
 extension CGFloat: Adapterable {

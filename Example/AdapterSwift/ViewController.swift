@@ -16,6 +16,13 @@ class ViewController: UIViewController {
         super.viewDidLoad()
     
 
+        let size = CGSize(width: 117.adapter, height: 40.adapter)
+        
+        let size1 = CGSize(width: 117, height: 40).adapter
+        
+        print(size, size1)
+        
+        CGSize(width: <#T##Int#>, height: <#T##Int#>)
         
         Adapter.share.base = 375
         
