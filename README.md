@@ -243,21 +243,6 @@ cView.snp.makeConstraints { make in
 
 
 
-
-
-
-
-## 检查
-
-适配完如何验证适配效果？ 
-
-对适配之后的不同屏幕截屏，缩放到375宽度（UI稿的机型宽度），拉线比较。
-
-![如何检查](https://github.com/intsig171/AdapterSwift/assets/87351449/e717ee61-a9f1-41f2-9b04-48701f04bbb6)
-
-
-
-
 ## 如何使用？
 
 ### 集成
