@@ -247,8 +247,26 @@ cView.snp.makeConstraints { make in
 
 ### 集成
 
-```
+#### CocoaPods
+
+```ruby
 pod 'AdapterSwift'
+```
+
+#### Swift Package Manager
+
+在Xcode中：
+
+1. 选择 File → Add Package Dependencies...
+2. 输入仓库地址：`https://github.com/intsig171/AdapterSwift.git`
+3. 选择版本并添加到项目
+
+或者在 `Package.swift` 中添加：
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/intsig171/AdapterSwift.git", from: "1.1.1")
+]
 ```
 
 ### 使用
