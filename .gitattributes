@@ -1,0 +1,6 @@
+# Swift Package Manager
+Package.swift text
+Package.resolved text
+
+# Swift Source
+*.swift text diff=swift
